@@ -65,4 +65,7 @@
 // 30 = Shared RAM                  0x80nnnn00
 // 31 = mDDR/DDR2 Data              0xC0nnnn00
 
+// Timer0 peripheral (only what we need)
+static volatile uint32_t * const TIMER0_TIM34 = (volatile uint32_t *)0x01C20014;
+
 #endif
