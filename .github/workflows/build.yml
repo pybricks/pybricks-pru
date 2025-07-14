@@ -1,0 +1,22 @@
+on:
+    - push
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:            
+            - uses: actions/checkout@v4
+
+            - name: Install toolchain
+              run: |
+                wget https://github.com/dinuxbg/gnupru/releases/download/2025.05/pru-elf-2025.05.amd64.tar.xz
+                tar xJf pru-elf-2025.05.amd64.tar.xz
+                echo "$(pwd)/pru-elf/bin" >> $GITHUB_PATH
+
+            - name: Compile project
+              run: make
+            
+            - uses: actions/upload-artifact@v4
+              with:
+                name: pru_ledpwm
+                path: pru_ledpwm.*
