@@ -10,6 +10,9 @@ LDFLAGS += -g -nostdlib -mmcu=am1808.pru1.specs
 
 all: $(BUILD_TARGET).bin
 
+# Manual dependency tracking
+main.o: am1808.h
+
 $(BUILD_TARGET).bin: $(BUILD_TARGET).elf
 
 $(BUILD_TARGET).elf: start.o main.o
