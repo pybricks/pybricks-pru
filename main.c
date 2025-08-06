@@ -29,6 +29,24 @@ static inline void update_pwm(uint8_t val, uint8_t time_now, uint32_t gpio_bit) 
     }
 }
 
+// I2C-related code
+
+// Sensor port pin definitions for software I2C driver.
+// It just so happens that all relevant SCL/SDA pins are on GPIO banks 0 or 1
+// which both exist in the same hardware register (bank 0 at bits[15:0] and
+// bank 1 at bits[31:16])
+// We therefore use a simplified pin definition and specify only the bit index
+// within that register. The PRU has efficient bit set/clear opcodes
+// that work well with this.
+#define SENSOR_PORT_1_PIN_SCL   2
+#define SENSOR_PORT_1_PIN_SDA   15
+#define SENSOR_PORT_2_PIN_SCL   14
+#define SENSOR_PORT_2_PIN_SDA   13
+#define SENSOR_PORT_3_PIN_SCL   12
+#define SENSOR_PORT_3_PIN_SDA   (14 + 16)
+#define SENSOR_PORT_4_PIN_SCL   1
+#define SENSOR_PORT_4_PIN_SDA   (15 + 16)
+
 void main() {
     uint32_t pwms = 0;
     while (1) {
