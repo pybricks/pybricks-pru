@@ -11,7 +11,7 @@ LDFLAGS += -g -nostdlib -mmcu=am1808.pru1.specs
 all: $(BUILD_TARGET).bin
 
 # Manual dependency tracking
-main.o: am1808.h
+main.o: am1808.h rproc_ev3_pru1.h
 
 $(BUILD_TARGET).bin: $(BUILD_TARGET).elf
 
