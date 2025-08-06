@@ -9,7 +9,8 @@
 // hardware indeed contains the correct address we *actually* want.
 // Upstream bug: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=121124
 // Revisit this once the patch lands in a release.
-static volatile pbdrv_rproc_ev3_pru1_shared_ram_t * const SHARED = (volatile pbdrv_rproc_ev3_pru1_shared_ram_t *)0x7f010000;
+static volatile pbdrv_rproc_ev3_pru1_shared_ram_t * const SHARED_HACK = (volatile pbdrv_rproc_ev3_pru1_shared_ram_t *)0x7f010000;
+static volatile pbdrv_rproc_ev3_pru1_shared_ram_t * const SHARED = (volatile pbdrv_rproc_ev3_pru1_shared_ram_t *)0x80010000;
 #pragma ctable_entry 30 0x7f010000
 
 // LED definitions
@@ -55,7 +56,7 @@ void main() {
 
         if (time_now == 0) {
             // 24 MHz / 256 / 256 ~= 366 Hz update rate
-            pwms = SHARED->pwms;
+            pwms = SHARED_HACK->pwms;
         }
 
         update_pwm(pwms >> 0, time_now, LED0);
@@ -67,13 +68,13 @@ void main() {
 
         // Handle GPIO direction set/clear
         uint32_t val;
-        if ((val = SHARED->gpio_bank_01_dir_set)) {
+        if ((val = SHARED_HACK->gpio_bank_01_dir_set)) {
             GPIO_BANK_01->dir |= val;
-            SHARED->gpio_bank_01_dir_set = 0;
+            SHARED_HACK->gpio_bank_01_dir_set = 0;
         }
-        if ((val = SHARED->gpio_bank_01_dir_clr)) {
+        if ((val = SHARED_HACK->gpio_bank_01_dir_clr)) {
             GPIO_BANK_01->dir &= ~val;
-            SHARED->gpio_bank_01_dir_clr = 0;
+            SHARED_HACK->gpio_bank_01_dir_clr = 0;
         }
     }
 }
