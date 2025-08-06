@@ -8,9 +8,11 @@ typedef struct shared_ram {
     uint32_t pwms;
 } shared_ram;
 // XXX: The real address in use here is 0x80010000
-// There appears to be a compiler bug where ctable entries with the MSB set
+// There is currently a compiler bug where ctable entries with the MSB set
 // do not get optimized correctly. We lie to the PRU compiler here, but the
 // hardware indeed contains the correct address we *actually* want.
+// Upstream bug: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=121124
+// Revisit this once the patch lands in a release.
 static volatile shared_ram * const SHARED = (volatile shared_ram *)0x7f010000;
 #pragma ctable_entry 30 0x7f010000
 
