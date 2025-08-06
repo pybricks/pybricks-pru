@@ -46,5 +46,16 @@ void main() {
         // This puts the pins into the order R, G, R, G
         update_pwm(pwms >> 16, time_now, LED3);
         update_pwm(pwms >> 24, time_now, LED2);
+
+        // Handle GPIO direction set/clear
+        uint32_t val;
+        if ((val = SHARED->gpio_bank_01_dir_set)) {
+            GPIO_BANK_01->dir |= val;
+            SHARED->gpio_bank_01_dir_set = 0;
+        }
+        if ((val = SHARED->gpio_bank_01_dir_clr)) {
+            GPIO_BANK_01->dir &= ~val;
+            SHARED->gpio_bank_01_dir_clr = 0;
+        }
     }
 }
