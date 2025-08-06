@@ -68,6 +68,12 @@
 // Timer0 peripheral (only what we need)
 static volatile uint32_t * const TIMER0_TIM34 = (volatile uint32_t *)0x01C20014;
 
+// Timer2 peripheral (only what we need)
+static volatile uint32_t * const TIMER2_TIM12 = (volatile uint32_t *)0x01F0C010;
+static volatile uint32_t * const TIMER2_INTCTLSTAT = (volatile uint32_t *)0x01F0C044;
+
+#define TIMER_INTCTLSTAT_PRDINTSTAT12   (1 << 1)
+
 // GPIO peripheral (only what we need)
 typedef struct {
     uint32_t dir;
