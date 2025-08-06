@@ -3,7 +3,7 @@ OBJCOPY = pru-objcopy
 BUILD_TARGET = pru_ledpwm
 
 ASFLAGS += -g
-CFLAGS += -g -Wall -Wno-main -Os
+CFLAGS += -g -Wall -Wimplicit-fallthrough -Wno-main -Os
 LDFLAGS += -g -nostdlib -mmcu=am1808.pru1.specs
 
 .PHONY: all clean
