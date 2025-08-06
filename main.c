@@ -48,6 +48,14 @@ static inline void update_pwm(uint8_t val, uint8_t time_now, uint32_t gpio_bit) 
 #define SENSOR_PORT_4_PIN_SCL   1
 #define SENSOR_PORT_4_PIN_SDA   (15 + 16)
 
+// I2C event definition. This currently is set up by the SUART code
+// and is thus defined to coexist with it.
+// bit5 is required to trigger the interrupt upon a write to R31.
+#define SENSOR_PORT_1_IRQ_EVT   ((1 << 5) | (42 - 32))
+#define SENSOR_PORT_2_IRQ_EVT   ((1 << 5) | (44 - 32))
+#define SENSOR_PORT_3_IRQ_EVT   ((1 << 5) | (46 - 32))
+#define SENSOR_PORT_4_IRQ_EVT   ((1 << 5) | (48 - 32))
+
 // This timeout specifies the *total permissible delay* of an I2C transaction.
 // This is the permissible sum total of all clock stretching as well as
 // the initial wait for the bus to become free. Time spent actually transferring
@@ -228,6 +236,9 @@ typedef struct i2c_state_struct {
     // Bit index of the IO pins in GPIO bank 0/1
     uint8_t scl_bit;
     uint8_t sda_bit;
+
+    // Event to trigger to inform the ARM of completion
+    uint8_t intr_event;
 } i2c_state_struct;
 i2c_state_struct i2c_states[PBDRV_RPROC_EV3_PRU1_NUM_I2C_BUSES];
 
@@ -471,6 +482,7 @@ i2c_state_stop:
                         0,
                         PBDRV_RPROC_EV3_PRU1_I2C_STAT_DONE | PBDRV_RPROC_EV3_PRU1_I2C_STAT_OK
                     );
+                    __R31 = i2c->intr_event;
                 }
             }
             break;
@@ -575,6 +587,7 @@ handle_nak:
             PBDRV_RPROC_EV3_PRU1_I2C_STAT_DONE | PBDRV_RPROC_EV3_PRU1_I2C_STAT_NAK
         );
         state = I2C_STATE_IDLE;
+        __R31 = i2c->intr_event;
     }
 
     if (0) {
@@ -588,6 +601,7 @@ handle_timeout:
                 PBDRV_RPROC_EV3_PRU1_I2C_STAT_DONE | PBDRV_RPROC_EV3_PRU1_I2C_STAT_TIMEOUT
             );
             state = I2C_STATE_IDLE;
+            __R31 = i2c->intr_event;
         }
     }
 
@@ -604,12 +618,16 @@ void main() {
     // We initialize this in code to avoid having to copy a data ram binary
     i2c_states[0].scl_bit = SENSOR_PORT_1_PIN_SCL;
     i2c_states[0].sda_bit = SENSOR_PORT_1_PIN_SDA;
+    i2c_states[0].intr_event = SENSOR_PORT_1_IRQ_EVT;
     i2c_states[1].scl_bit = SENSOR_PORT_2_PIN_SCL;
     i2c_states[1].sda_bit = SENSOR_PORT_2_PIN_SDA;
+    i2c_states[1].intr_event = SENSOR_PORT_2_IRQ_EVT;
     i2c_states[2].scl_bit = SENSOR_PORT_3_PIN_SCL;
     i2c_states[2].sda_bit = SENSOR_PORT_3_PIN_SDA;
+    i2c_states[2].intr_event = SENSOR_PORT_3_IRQ_EVT;
     i2c_states[3].scl_bit = SENSOR_PORT_4_PIN_SCL;
     i2c_states[3].sda_bit = SENSOR_PORT_4_PIN_SDA;
+    i2c_states[3].intr_event = SENSOR_PORT_4_IRQ_EVT;
 
     while (1) {
         // 24 MHz / 256 ==> 93.75 kHz tick rate for this counter
